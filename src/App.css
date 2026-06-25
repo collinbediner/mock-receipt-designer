@@ -266,14 +266,15 @@ button.danger {
 
 .resize-handle {
   position: absolute;
-  right: -6px;
-  bottom: -6px;
-  width: 14px;
-  height: 14px;
-  border: 2px solid #0f766e;
-  border-radius: 3px;
-  background: #ffffff;
+  right: -10px;
+  bottom: -10px;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   cursor: nwse-resize;
+  opacity: 0;
 }
 
 .canvas-text {
