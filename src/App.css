@@ -244,9 +244,9 @@ button.danger {
   z-index: 1;
   width: 150%;
   transform: translate(-50%, -50%) rotate(-32deg);
-  color: rgba(180, 35, 24, 0.18);
+  color: rgba(55, 65, 81, 0.1);
   font-family: Arial, sans-serif;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 900;
   letter-spacing: 0;
   pointer-events: none;
