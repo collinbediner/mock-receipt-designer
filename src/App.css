@@ -222,6 +222,7 @@ button.danger {
 
 .freeform-paper {
   padding: var(--paper-padding);
+  padding-bottom: calc(var(--paper-padding) + 24px);
   background: var(--paper-color);
   border: var(--paper-border-width) solid var(--paper-border-color);
 }
@@ -260,6 +261,18 @@ button.danger {
   background: rgba(15, 118, 110, 0.04);
 }
 
+.resize-handle {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #0f766e;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: nwse-resize;
+}
+
 .canvas-text {
   display: block;
   white-space: pre-wrap;
@@ -268,9 +281,9 @@ button.danger {
 
 .canvas-footer {
   position: absolute;
-  right: 16px;
-  bottom: 10px;
-  left: 16px;
+  right: var(--paper-padding);
+  bottom: 4px;
+  left: var(--paper-padding);
   z-index: 2;
   margin: 0;
   color: #374151;

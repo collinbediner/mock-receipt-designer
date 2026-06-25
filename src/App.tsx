@@ -153,7 +153,16 @@ function App() {
   const [status, setStatus] = useState('')
   const previewRef = useRef<HTMLDivElement | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const dragRef = useRef<{ id: string; startX: number; startY: number; originX: number; originY: number } | null>(null)
+  const dragRef = useRef<{
+    id: string
+    mode: 'move' | 'resize'
+    startX: number
+    startY: number
+    originX: number
+    originY: number
+    originWidth: number
+    originHeight: number
+  } | null>(null)
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(editorState))
@@ -221,6 +230,10 @@ function App() {
     }))
     setSelectedId(null)
     setStatus('Selected element removed.')
+  }
+
+  const stopInteraction = () => {
+    dragRef.current = null
   }
 
   const clearSavedData = () => {
@@ -737,25 +750,44 @@ function App() {
                   target.setPointerCapture(event.pointerId)
                   dragRef.current = {
                     id: element.id,
+                    mode: 'move',
                     startX: event.clientX,
                     startY: event.clientY,
                     originX: element.x,
                     originY: element.y,
+                    originWidth: element.width,
+                    originHeight: element.type === 'image' ? element.height : 0,
                   }
                   setSelectedId(element.id)
                 }}
                 onPointerMove={(event) => {
                   if (!dragRef.current || dragRef.current.id !== element.id) return
-                  const deltaX = event.clientX - dragRef.current.startX
-                  const deltaY = event.clientY - dragRef.current.startY
+                  const interaction = dragRef.current
+                  const deltaX = event.clientX - interaction.startX
+                  const deltaY = event.clientY - interaction.startY
+
+                  if (interaction.mode === 'move') {
+                    updateElement(element.id, {
+                      x: Math.round(interaction.originX + deltaX),
+                      y: Math.round(interaction.originY + deltaY),
+                    })
+                    return
+                  }
+
+                  if (element.type === 'text') {
+                    updateElement(element.id, {
+                      width: Math.max(80, Math.round(interaction.originWidth + deltaX)),
+                    })
+                    return
+                  }
+
                   updateElement(element.id, {
-                    x: Math.round(dragRef.current.originX + deltaX),
-                    y: Math.round(dragRef.current.originY + deltaY),
+                    width: Math.max(60, Math.round(interaction.originWidth + deltaX)),
+                    height: Math.max(40, Math.round(interaction.originHeight + deltaY)),
                   })
                 }}
-                onPointerUp={() => {
-                  dragRef.current = null
-                }}
+                onPointerUp={stopInteraction}
+                onPointerCancel={stopInteraction}
               >
                 {element.type === 'text' ? (
                   <span
@@ -786,6 +818,26 @@ function App() {
                     }}
                   />
                 )}
+                <span
+                  className="resize-handle"
+                  role="presentation"
+                  onPointerDown={(event) => {
+                    event.stopPropagation()
+                    const target = event.currentTarget.parentElement
+                    target?.setPointerCapture(event.pointerId)
+                    dragRef.current = {
+                      id: element.id,
+                      mode: 'resize',
+                      startX: event.clientX,
+                      startY: event.clientY,
+                      originX: element.x,
+                      originY: element.y,
+                      originWidth: element.width,
+                      originHeight: element.type === 'image' ? element.height : 0,
+                    }
+                    setSelectedId(element.id)
+                  }}
+                />
               </button>
             ))}
 
