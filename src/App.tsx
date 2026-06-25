@@ -168,6 +168,54 @@ function App() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(editorState))
   }, [editorState])
 
+  useEffect(() => {
+    const handlePointerMove = (event: PointerEvent) => {
+      if (!dragRef.current) return
+
+      event.preventDefault()
+      const interaction = dragRef.current
+      const deltaX = event.clientX - interaction.startX
+      const deltaY = event.clientY - interaction.startY
+
+      if (interaction.mode === 'move') {
+        updateElement(interaction.id, {
+          x: Math.round(interaction.originX + deltaX),
+          y: Math.round(interaction.originY + deltaY),
+        })
+        return
+      }
+
+      const currentElement = editorState.elements.find((element) => element.id === interaction.id)
+      if (!currentElement) return
+
+      if (currentElement.type === 'text') {
+        updateElement(interaction.id, {
+          width: Math.max(80, Math.round(interaction.originWidth + deltaX)),
+        })
+        return
+      }
+
+      updateElement(interaction.id, {
+        width: Math.max(60, Math.round(interaction.originWidth + deltaX)),
+        height: Math.max(40, Math.round(interaction.originHeight + deltaY)),
+      })
+    }
+
+    const handlePointerUp = () => {
+      dragRef.current = null
+    }
+
+    window.addEventListener('pointermove', handlePointerMove)
+    window.addEventListener('pointerup', handlePointerUp)
+    window.addEventListener('pointercancel', handlePointerUp)
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('pointerup', handlePointerUp)
+      window.removeEventListener('pointercancel', handlePointerUp)
+    }
+  }, [editorState.elements])
+
   const selectedElement = editorState.elements.find((element) => element.id === selectedId) ?? null
 
   const updateSettings = <K extends keyof CanvasSettings>(field: K, value: CanvasSettings[K]) => {
@@ -731,10 +779,11 @@ function App() {
             <div className="watermark">SAMPLE - NOT A VALID RECEIPT</div>
 
             {editorState.elements.map((element) => (
-              <button
+              <div
                 key={element.id}
-                type="button"
                 className={`canvas-element ${selectedId === element.id ? 'selected' : ''}`}
+                role="button"
+                tabIndex={0}
                 style={
                   {
                     left: element.x,
@@ -746,8 +795,7 @@ function App() {
                 }
                 onClick={() => setSelectedId(element.id)}
                 onPointerDown={(event) => {
-                  const target = event.currentTarget
-                  target.setPointerCapture(event.pointerId)
+                  event.preventDefault()
                   dragRef.current = {
                     id: element.id,
                     mode: 'move',
@@ -760,34 +808,17 @@ function App() {
                   }
                   setSelectedId(element.id)
                 }}
-                onPointerMove={(event) => {
-                  if (!dragRef.current || dragRef.current.id !== element.id) return
-                  const interaction = dragRef.current
-                  const deltaX = event.clientX - interaction.startX
-                  const deltaY = event.clientY - interaction.startY
-
-                  if (interaction.mode === 'move') {
-                    updateElement(element.id, {
-                      x: Math.round(interaction.originX + deltaX),
-                      y: Math.round(interaction.originY + deltaY),
-                    })
-                    return
-                  }
-
-                  if (element.type === 'text') {
-                    updateElement(element.id, {
-                      width: Math.max(80, Math.round(interaction.originWidth + deltaX)),
-                    })
-                    return
-                  }
-
-                  updateElement(element.id, {
-                    width: Math.max(60, Math.round(interaction.originWidth + deltaX)),
-                    height: Math.max(40, Math.round(interaction.originHeight + deltaY)),
-                  })
+                onPointerUp={(event) => {
+                  event.preventDefault()
+                  stopInteraction()
                 }}
-                onPointerUp={stopInteraction}
                 onPointerCancel={stopInteraction}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    setSelectedId(element.id)
+                  }
+                }}
               >
                 {element.type === 'text' ? (
                   <span
@@ -822,9 +853,8 @@ function App() {
                   className="resize-handle"
                   role="presentation"
                   onPointerDown={(event) => {
+                    event.preventDefault()
                     event.stopPropagation()
-                    const target = event.currentTarget.parentElement
-                    target?.setPointerCapture(event.pointerId)
                     dragRef.current = {
                       id: element.id,
                       mode: 'resize',
@@ -838,7 +868,7 @@ function App() {
                     setSelectedId(element.id)
                   }}
                 />
-              </button>
+              </div>
             ))}
 
             <p className="sample-note canvas-footer">{editorState.settings.sampleFooter}</p>

@@ -252,8 +252,10 @@ button.danger {
   border: 1px dashed transparent;
   background: transparent;
   color: inherit;
+  cursor: move;
   text-align: inherit;
   touch-action: none;
+  user-select: none;
 }
 
 .canvas-element:hover,
@@ -278,6 +280,7 @@ button.danger {
   display: block;
   white-space: pre-wrap;
   word-break: break-word;
+  user-select: none;
 }
 
 .canvas-footer {
