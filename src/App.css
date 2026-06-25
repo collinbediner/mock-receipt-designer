@@ -169,6 +169,40 @@ button.danger {
   width: auto;
 }
 
+.logo-uploader {
+  border: 1px solid #9aa8b1;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+  background: #f8fafb;
+}
+
+.logo-uploader label {
+  margin-bottom: 6px;
+}
+
+.logo-uploader p {
+  margin: 0 0 10px;
+  color: #52616b;
+  font-size: 0.88rem;
+}
+
+.logo-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.logo-preview img {
+  width: 64px;
+  height: 64px;
+  border: 1px solid #cfd8dc;
+  border-radius: 6px;
+  object-fit: contain;
+  background: #ffffff;
+}
+
 .validation-box,
 .status-message {
   border-radius: 8px;

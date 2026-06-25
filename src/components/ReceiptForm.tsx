@@ -136,10 +136,24 @@ export function ReceiptForm({
         />
         <TextInput label="Phone number" value={data.store.phone} onChange={(value) => updateStore('phone', value)} />
         <TextInput label="Website" value={data.store.website} onChange={(value) => updateStore('website', value)} />
-        <label>
-          Logo image
-          <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => handleLogo(event.target.files?.[0])} />
-        </label>
+        <div className="logo-uploader">
+          <label htmlFor="logo-upload">Upload store logo</label>
+          <p>Choose a PNG, JPEG, or WebP image from your computer. It stays in your browser only.</p>
+          <input
+            id="logo-upload"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            onChange={(event) => handleLogo(event.target.files?.[0])}
+          />
+          {data.store.logoDataUrl && (
+            <div className="logo-preview">
+              <img src={data.store.logoDataUrl} alt={`${data.store.name || 'Uploaded store'} logo preview`} />
+              <button type="button" className="secondary" onClick={() => updateStore('logoDataUrl', '')}>
+                Remove logo
+              </button>
+            </div>
+          )}
+        </div>
         <TextArea
           label="Optional header message"
           value={data.store.headerMessage}
