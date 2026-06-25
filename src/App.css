@@ -229,14 +229,15 @@ button.danger {
 
 .watermark {
   position: absolute;
-  top: 44%;
+  top: auto;
+  bottom: 44px;
   left: 50%;
   z-index: 1;
   width: 160%;
-  transform: translate(-50%, -50%) rotate(-32deg);
+  transform: translateX(-50%) rotate(-12deg);
   color: rgba(55, 65, 81, 0.1);
   font-family: Arial, sans-serif;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 900;
   letter-spacing: 0;
   pointer-events: none;
